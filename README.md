@@ -21,5 +21,5 @@ To test this validation functionality works as expected.
 ![validation](https://github.com/ahmed-faroukk/bloc_validation_flutter/assets/72602749/2b0d9d4b-9c6d-442b-8905-8f624b1df4af)
 
 # demo 
-https://github.com/ahmed-faroukk/bloc_validation_flutter/assets/72602749/5933a578-3e8c-4560-a8d9-3ddb8c0bd3b3
+https://github.com/ahmed-faroukk/bloc_validation_flutter/assets/72602749/7ed9256c-c335-475d-a11b-5e3daf4fc8e5
 
