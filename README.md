@@ -1,16 +1,18 @@
-# auth_app
+# Validation with BLoC
 
-A new Flutter project.
+## Overview
+The app uses the BLoC (Business Logic Component) pattern to manage state and handle validation logic. BLoC helps to separate the presentation layer from the business logic, making the app more modular and testable.
 
-## Getting Started
+## Implementation
 
-This project is a starting point for a Flutter application.
+### BLoC Structure:
+- **AuthBloc:** Handles authentication events and states.
+- **AuthEvent:** Defines events like email changes, password changes, and form submission.
+- **AuthState:** Defines states such as initial, loading, authenticated, and error.
 
-A few resources to get you started if this is your first Flutter project:
+### Validation Logic:
+- Implement validation in the BLoC for input fields such as email and password.
+- Use streams to manage validation errors and states.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Unit Testing
+To test this validation functionality works as expected.
