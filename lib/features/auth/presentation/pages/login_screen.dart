@@ -1,6 +1,8 @@
+import 'package:auth_app/features/auth/presentation/pages/signup_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import '../../../../util/animation/fade_animation.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -18,6 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isValid = false; // Flag to control button state
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +50,8 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.of(context).pushReplacementNamed('/home');
     } else if (state.status == FormzSubmissionStatus.failure) {
       _dismissLoadingIndicator(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Login failed')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Login failed')));
     }
   }
 
@@ -74,78 +78,83 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildFormContent() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 70, 20, 0),
-          child:
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Container(
-                      width: 70,
-                      height: 70,
-                      child: Image.asset("assets/star.png")),
-                ],
-              ),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(
-                      'Log In', style: TextStyle(color: Colors.black, fontSize: 32 ,fontWeight: FontWeight.bold)),
-                ],
-              ),              _buildEmailField(),
-              _buildPasswordField(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      // Navigate to forget password screen
-                    },
-                    child: const Text('Forgot password?', style: TextStyle(color: Colors.black)),
-                  ),
-                ],
-              ),
-              _buildLoginButton(),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 95,
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.black,
-                    ),
-                  ),
-                  Text("Or Login With"),
-                  SizedBox(
-                    width: 95,
-                    child: Divider(
-                      thickness: 1,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              _buildSocialLoginButtons(),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text("Don’t have an account?"),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/signup');
-                    },
-                    child: const Text('SignUp' , style: TextStyle(color: Colors.black),),
-                  ),
-                ],
-              )
+              Container(
+                  width: 70, height: 70, child: Image.asset("assets/star.png")),
             ],
           ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text('Log In',
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold)),
+            ],
+          ),
+          _buildEmailField(),
+          _buildPasswordField(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: () {
+                  // Navigate to forget password screen
+                },
+                child: const Text('Forgot password?',
+                    style: TextStyle(color: Colors.black)),
+              ),
+            ],
+          ),
+          _buildLoginButton(),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 95,
+                child: Divider(
+                  thickness: 1,
+                  color: Colors.black,
+                ),
+              ),
+              Text("Or Login With"),
+              SizedBox(
+                width: 95,
+                child: Divider(
+                  thickness: 1,
+                  color: Colors.black,
+                ),
+              ),
+            ],
+          ),
+          _buildSocialLoginButtons(),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text("Don’t have an account?"),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).push(FadeRoute(page: SignUpPage()));
+                },
+                child: const Text(
+                  'SignUp',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
     );
   }
 
@@ -159,11 +168,13 @@ class _LoginPageState extends State<LoginPage> {
             context.read<MyFormBloc>().add(EmailChanged(email: value));
             _formKey.currentState?.validate();
           },
-            validator: (value) {
-            if(value == "") {
+          validator: (value) {
+            if (value == "") {
               return null;
             }
-            return state.email.error?.toString();
+             if (state.email.error != null) {
+               return "Please ensure the email entered is valid";
+             }
           },
         );
       },
@@ -193,9 +204,10 @@ class _LoginPageState extends State<LoginPage> {
       ],
     );
   }
-  bool _obscureText = true;
-  Widget _buildPasswordField() {
 
+  bool _obscureText = true;
+
+  Widget _buildPasswordField() {
     return BlocBuilder<MyFormBloc, MyFormState>(
       builder: (context, state) {
         return Column(
@@ -208,18 +220,27 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 5),
             TextFormField(
               controller: _passwordController,
-              decoration: _buildInputDecorationForPass(obscureText: _obscureText),
+              decoration:
+                  _buildInputDecorationForPass(obscureText: _obscureText),
               obscureText: true,
               onChanged: (value) {
-                  context.read<MyFormBloc>().add(
-                  PasswordChanged(password: value),
-                );
+                context.read<MyFormBloc>().add(
+                      PasswordChanged(password: value),
+                    );
               },
               validator: (value) {
-                if(value == "") {
+                if (value == "") {
                   return null;
                 }
-                return state.password.error?.toString();
+                if (state.password.error != null) {
+                      if (value!.length <= 8 ) {
+                        return "Password must be more than 8 characters";
+                      } else if (!_containsNumbers(value)) {
+                        return "Password must contain at least one number";
+                      } else if (!_containsLetters(value)) {
+                        return "Password must contain at least one letter";
+                      }
+                }
               },
             ),
           ],
@@ -227,9 +248,18 @@ class _LoginPageState extends State<LoginPage> {
       },
     );
   }
+  bool _containsNumbers(String value) {
+    return value.contains(RegExp(r'\d'));
+  }
+
+  bool _containsLetters(String value) {
+    return value.contains(RegExp(r'[a-zA-Z]'));
+  }
+
   InputDecoration _buildInputDecorationForPass({bool obscureText = true}) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+      contentPadding:
+          const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(
@@ -265,11 +295,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-
-
   InputDecoration _buildInputDecoration() {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+      contentPadding:
+          const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(
@@ -299,13 +328,12 @@ class _LoginPageState extends State<LoginPage> {
     return BlocBuilder<MyFormBloc, MyFormState>(
       builder: (context, state) {
         return buildRoundedButton(
-          text: "Login",
-          onClick: () {
-            context.read<MyFormBloc>().add(
-              FormSubmitted(),
-            );
-          }
-        );
+            text: "Login",
+            onClick: () {
+              context.read<MyFormBloc>().add(
+                    FormSubmitted(),
+                  );
+            });
       },
     );
   }
@@ -314,19 +342,15 @@ class _LoginPageState extends State<LoginPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-
-        _buildSocialButton(iconPath: "assets/facebook.png", onPressed: (){
-
-        }),_buildSocialButton(iconPath: "assets/google.png", onPressed: (){
-
-        }),_buildSocialButton(iconPath: "assets/apple.png", onPressed: (){
-
-        }),
+        _buildSocialButton(iconPath: "assets/facebook.png", onPressed: () {}),
+        _buildSocialButton(iconPath: "assets/google.png", onPressed: () {}),
+        _buildSocialButton(iconPath: "assets/apple.png", onPressed: () {}),
       ],
     );
   }
 
-  Widget _buildSocialButton({required String iconPath, required VoidCallback onPressed}) {
+  Widget _buildSocialButton(
+      {required String iconPath, required VoidCallback onPressed}) {
     return InkWell(
       onTap: onPressed,
       child: Container(
@@ -353,17 +377,15 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                       Container(
-                           width: 30,
-                           height: 30,
-                           child: Image.asset(iconPath)),
+                  Container(
+                      width: 30, height: 30, child: Image.asset(iconPath)),
                 ],
               ),
             ),
-
           ],
         ),
       ),
     );
   }
 }
+

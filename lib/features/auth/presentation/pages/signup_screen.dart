@@ -1,7 +1,9 @@
+import 'package:auth_app/features/auth/presentation/pages/login_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
+import '../../../../util/animation/fade_animation.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -70,7 +72,6 @@ class _SignUpPageState extends State<SignUpPage> {
     Navigator.of(context).pop();
   }
 
-
   Widget backBtn({required IconData icon, required VoidCallback onPressed}) {
     return InkWell(
       onTap: onPressed,
@@ -119,7 +120,10 @@ class _SignUpPageState extends State<SignUpPage> {
             alignment: Alignment.centerLeft,
             child: Text(
               'Sign Up',
-              style: TextStyle(color: Colors.black, fontSize: 32, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 20),
@@ -146,9 +150,10 @@ class _SignUpPageState extends State<SignUpPage> {
               const Text("Don’t have an account?"),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).popAndPushNamed('/login');
+                  Navigator.of(context).pushReplacement(FadeRoute(page: LoginPage()));
                 },
-                child: const Text('Login', style: TextStyle(color: Colors.black)),
+                child:
+                    const Text('Login', style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
@@ -163,12 +168,15 @@ class _SignUpPageState extends State<SignUpPage> {
         return _buildTextField(
           controller: _emailController,
           label: 'Email address',
-          onChanged: (value) => context.read<MyFormBloc>().add(EmailChanged(email: value)),
-            validator: (value) {
-              if(value == "") {
-                return null;
-              }
-              return state.email.error?.toString();
+          onChanged: (value) =>
+              context.read<MyFormBloc>().add(EmailChanged(email: value)),
+          validator: (value) {
+            if (value == "") {
+              return null;
+            }
+            if (state.email.error != null) {
+              return "Please ensure the email entered is valid";
+            }
             },
         );
       },
@@ -182,41 +190,59 @@ class _SignUpPageState extends State<SignUpPage> {
           controller: _passwordController,
           label: 'Password',
           obscureText: _obscureText,
-          onChanged: (value) => context.read<MyFormBloc>().add(PasswordChanged(password: value)),
-            validator: (value) {
-              if(value == "") {
-                return null;
+          onChanged: (value) =>
+              context.read<MyFormBloc>().add(PasswordChanged(password: value)),
+          validator: (value) {
+            if (value == "") {
+              return null;
+            }
+            if (state.password.error != null) {
+              if (value!.length <= 8 ) {
+                return "Password must be more than 8 characters";
+              } else if (!_containsNumbers(value)) {
+                return "Password must contain at least one number";
+              } else if (!_containsLetters(value)) {
+                return "Password must contain at least one letter";
               }
-              return state.password.error?.toString();
-            },
+            }          },
           suffixIcon: GestureDetector(
             onTap: () => setState(() => _obscureText = !_obscureText),
-            child: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
+            child: Icon(_obscureText ? Icons.visibility_off : Icons.visibility,
+                color: Colors.grey),
           ),
         );
       },
     );
   }
 
-  Widget _buildConfirmPasswordField() {
-        return _buildTextField(
-          controller: _confirmPasswordController,
-          label: 'Confirm Password',
-          obscureText: _obscureText,
-          onChanged: (value) => context.read<MyFormBloc>().add(PasswordChanged(password: value)),
-          validator: (value) {
-            if(value == "") {
-              return null;
-            }
-            if(_passwordController.value != _confirmPasswordController.value )
-            return "not match your password";
-          },
-          suffixIcon: GestureDetector(
-            onTap: () => setState(() => _obscureText = !_obscureText),
-            child: Icon(_obscureText ? Icons.visibility_off : Icons.visibility, color: Colors.grey),
-          ),
-        );
+  bool _containsNumbers(String value) {
+    return value.contains(RegExp(r'\d'));
+  }
 
+  bool _containsLetters(String value) {
+    return value.contains(RegExp(r'[a-zA-Z]'));
+  }
+
+  Widget _buildConfirmPasswordField() {
+    return _buildTextField(
+      controller: _confirmPasswordController,
+      label: 'Confirm Password',
+      obscureText: _obscureText,
+      onChanged: (value) =>
+          context.read<MyFormBloc>().add(PasswordChanged(password: value)),
+      validator: (value) {
+        if (value == "") {
+          return null;
+        }
+        if (_passwordController.value != _confirmPasswordController.value)
+          return "not match your password";
+      },
+      suffixIcon: GestureDetector(
+        onTap: () => setState(() => _obscureText = !_obscureText),
+        child: Icon(_obscureText ? Icons.visibility_off : Icons.visibility,
+            color: Colors.grey),
+      ),
+    );
   }
 
   Widget _buildTextField({
@@ -245,7 +271,8 @@ class _SignUpPageState extends State<SignUpPage> {
 
   InputDecoration _buildInputDecoration({Widget? suffixIcon}) {
     return InputDecoration(
-      contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+      contentPadding:
+          const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
       filled: true,
       fillColor: Colors.white,
       border: OutlineInputBorder(
