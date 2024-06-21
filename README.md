@@ -16,3 +16,10 @@ The app uses the BLoC (Business Logic Component) pattern to manage state and han
 
 ## Unit Testing
 To test this validation functionality works as expected.
+
+# app flow 
+![validation](https://github.com/ahmed-faroukk/bloc_validation_flutter/assets/72602749/2b0d9d4b-9c6d-442b-8905-8f624b1df4af)
+
+# demo 
+https://github.com/ahmed-faroukk/bloc_validation_flutter/assets/72602749/5933a578-3e8c-4560-a8d9-3ddb8c0bd3b3
+
